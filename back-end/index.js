@@ -17,8 +17,8 @@ app.use(bodyParser.json());
 const port = 1111;
 
 const users = [
-  { name: "Dashka", age: 25 },
-  { name: "Bold", age: 30 },
+  { id: 1, name: "Dashka", age: 25 },
+  { id: 2, name: "Bold", age: 30 },
 ];
 
 app.get("/users", (request, response) => {
@@ -28,18 +28,52 @@ app.get("/users", (request, response) => {
 app.post("/users", (request, response) => {
   const { name, age } = request.body;
 
+  if (!name || !age) {
+    return response.send({ error: "All fields are required" });
+  } else if (typeof name !== `string` || typeof age != `number`) {
+    return response.send({ error: "Wrong Type" });
+  } else {
+    const newUser = {
+      id: Date.now().toString(),
+      name: name,
+      age: age,
+    };
+
+    users.push(newUser);
+  }
+
+  response.send(users);
   console.log(request.body);
-  response.send("Hello received POST request");
 });
 
 app.put("/users", (request, response) => {
+  const { id, name, age } = request.body;
+
+  const editedUser = users.map((user) => {
+    if (user.id === id) {
+      return {
+        id,
+        name,
+        age,
+      };
+    }
+    return user;
+  });
+
   console.log(request.body);
-  response.send("Hello received PUT request");
+  response.send(editedUser);
 });
 
 app.delete("/users", (request, response) => {
+  const deletedUser = users.filter((user) => {
+    // if (user.id === id) {
+    //   return {};
+    //   return user;
+    // }
+  });
+
   console.log(request.body);
-  response.send("Hello received DELETE request");
+  response.send("deletedUser");
 });
 
 app.listen(port, () => {
