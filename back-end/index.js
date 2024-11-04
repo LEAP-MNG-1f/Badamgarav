@@ -8,7 +8,7 @@
 
 // server.listen(3333);
 
-import express from "express";
+import express, { response } from "express";
 import bodyParser from "body-parser";
 
 const app = express();
@@ -46,34 +46,66 @@ app.post("/users", (request, response) => {
   console.log(request.body);
 });
 
-app.put("/users", (request, response) => {
-  const { id, name, age } = request.body;
+// app.put("/users", (request, response) => {
+//   const { id, name, age } = request.body;
 
-  const editedUser = users.map((user) => {
-    if (user.id === id) {
-      return {
-        id,
-        name,
-        age,
-      };
+//   console.log(id);
+
+//   const editedUser = users.map((user) => {
+//     if (user.id === id) {
+//       return {
+//         id,
+//         name,
+//         age,
+//       };
+//     }
+//     return user;
+//   });
+
+//   console.log(request.body);
+//   response.send(editedUser);
+// });
+
+app.get("users", (request, response) => {
+  const { id, updatedName, updatedAge } = request.body;
+
+  if (!id) {
+    return response.send("ID bhgui bna");
+  }
+  if (!updatedName && !updatedAge) {
+    return response.send("2laa bhgui bna");
+  }
+
+  users.find((user) => {
+    if (user.id == id) {
+      if (updatedName) {
+        user.name = updatedName;
+      }
+      if (updatedAge) {
+        user.age = updatedAge;
+      }
+      return user;
     }
-    return user;
   });
-
-  console.log(request.body);
-  response.send(editedUser);
 });
 
 app.delete("/users", (request, response) => {
-  const deletedUser = users.filter((user) => {
-    // if (user.id === id) {
-    //   return {};
-    //   return user;
-    // }
-  });
+  const { id } = request.body;
 
-  console.log(request.body);
-  response.send("deletedUser");
+  console.log(id);
+
+  const filteredUser = users.filter((user) => {
+    if (user.id !== id) {
+      return user;
+    }
+  });
+  users = filteredUser;
+
+  // if (filteredUser.length > 0) {
+  //   response.send("User not found");
+  // }
+
+  response.send(filteredUser);
 });
 
 app.listen(port, () => {
